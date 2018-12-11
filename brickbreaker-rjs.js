@@ -3,22 +3,40 @@ let paddle;
 let ball;
 let bricks = [];
 let bgmusic;
+let brickSFX;
+let paddleSFX;
+let wallbounceSFX;
+let gameoverSFX;
+let youwinSFX;
 
 function preload(){
-  bgmusic = loadSound("bgmusic.wav");
+  bgmusic = loadSound("sounds/bgmusic.mp3");
+  brickSFX = loadSound("sounds/brickhit.mp3");
+  paddleSFX = loadSound("sounds/paddlehit.mp3");
+  wallbounceSFX = loadSound("sounds/bounce.mp3")
+  gameoverSFX = loadSound("sounds/gameover.mp3");
+  youwinSFX = loadSound("sounds/youwin.mp3");
 
 }
 
 
 function setup() {
   createCanvas(640, 480);
-  bgmusic.play();
+  bgmusic.loop();
+  bgmusic.setVolume(0.3);
+  brickSFX.setVolume(0.5);
+  paddleSFX.setVolume(0.5);
+  wallbounceSFX.setVolume(0.5);
+  gameoverSFX.setVolume(0.6);
+  youwinSFX.setVolume(0.5);
+  // gameoverSFX.playMode("restart")
   gameSetup();
   let button = createButton("reset");
   button.mousePressed(gameSetup);
 
 //function for what happens everytime the game resets
   function gameSetup(){
+    frameRate(60);
     playerScore = 0;
     timer = 3;
     let colors = [color("#EDF67D"), color("#CA7DF9"), color("#724CF9"), color("#473978")];
@@ -56,6 +74,11 @@ function draw() {
 
   drawScore();
 
+  if(gameoverSFX.isPlaying() || youwinSFX.isPlaying()){
+    frameRate(0);
+
+  }
+
   // When the ball collides with the brick, remove brick
   for (let i = bricks.length - 1; i >=0; i--){
     const brick = bricks[i]
@@ -64,6 +87,7 @@ function draw() {
         ball.speed.y = ball.speed.y *  -1;
         bricks.splice(i,1);
         playerScore = playerScore + 1;
+        brickSFX.play();
       }
     }
 
@@ -71,6 +95,7 @@ function draw() {
   if (bricks.length<=0){
     ball.speed.y = ball.speed.y *  0;
     ball.speed.x = ball.speed.x * 0;
+    youwinSFX.play();
     drawYouWin();
   }
 
@@ -144,10 +169,10 @@ class Paddle{
 
 class Ball {
   constructor() {
-    this.position = createVector(width/2, height/2);
+    this.position = createVector(width/2, height-40);
     this.color = color("#87D37C");
     this.size = 15;
-    this.speed = createVector(5,4)
+    this.speed = createVector(-5,-4)
   }
 
   display(){
@@ -165,23 +190,26 @@ class Ball {
     if (this.position.y >= paddle.position.y){
       if(this.position.x >= paddle.position.x && this.position.x <= paddle.position.x + paddle.width){
         this.speed.y = this.speed.y *  -1;
+        paddleSFX.play();
         }
       //if ball hits the bottom of the screen
       else {
         this.speed.y = this.speed.y *  0;
         this.speed.x = this.speed.x *  0;
         drawGameOver();
-
+        gameoverSFX.play();
       }
     }
     //when the ball touches the sides of the screen
     if(this.position.x >= width || this.position.x <= 0){
       this.speed.x = this.speed.x *  -1;
+      wallbounceSFX.play();
       }
 
     //when the ball touches the top of the screen
     if (this.position.y<=0){
       this.speed.y = this.speed.y *  -1;
+      wallbounceSFX.play();
       }
   }
 
