@@ -29,7 +29,6 @@ function setup() {
   wallbounceSFX.setVolume(0.5);
   gameoverSFX.setVolume(0.6);
   youwinSFX.setVolume(0.5);
-  // gameoverSFX.playMode("restart")
   gameSetup();
   let button = createButton("reset");
   button.mousePressed(gameSetup);
